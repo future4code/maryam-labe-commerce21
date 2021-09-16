@@ -11,16 +11,17 @@ const ContainerOrdenacao = styled.div`
 `;
 
 const CabecalhoMain = styled.div`
-  background-color: grey;
+  background-color: #c06bae;
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 50px;
   text-align: center;
+  padding: 0 15px;
 `;
 
 const Main = styled.main`
-  background-color: yellow;
+  background-color: #875dd9;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -31,35 +32,55 @@ const Main = styled.main`
 
 const DivProdutos = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, 250px);
+  grid-template-columns: repeat(3, 250px);
   gap: 8px;
   padding: 10px;
   justify-content: center;
 `;
 
+
 export default class Products extends React.Component {
+
+  state = {
+    sort: 'DECRESCENTE'
+  }
+
+  getFiltraEOrdenaLista = () => {
+    return this.props.produtos
+      .filter((produto) => this.props.maximoFilter ? produto.preco < this.props.maximoFilter : true)
+      .filter((produto) => this.props.minimoFilter ? produto.preco > this.props.minimoFilter : true)
+      .filter((produto) => this.props.nomeFilter ? produto.nome.includes(this.props.nomeFilter) : true)
+      .sort((a, b) => this.state.sort === 'CRESCENTE' ? a.preco - b.preco : b.preco - a.preco)
+  }
+
+  onChangeSort = (event) => {
+    this.setState({sort: event.target.value})
+  }
+
   render() {
+    const filtraEOrdenaLista = this.getFiltraEOrdenaLista()
     return (
       <Main>
         <CabecalhoMain>
-          <div>Quantidade de produtos: 6</div>
+          <div>Quantidade de produtos: {filtraEOrdenaLista.length}</div>
 
           <ContainerOrdenacao>
             <p>Ordenação:</p>
-            <select>
-              <option>Crescente</option>
-              <option>Decrescente</option>
+            <select value={this.state.sort} onChange={this.onChangeSort}>
+              <option value={'CRESCENTE'}>Crescente</option>
+              <option value={'DECRESCENTE'}>Decrescente</option>
             </select>
           </ContainerOrdenacao>
+
         </CabecalhoMain>
 
         <DivProdutos>
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
+        {filtraEOrdenaLista.map((produto) => {
+          return <ProductCard
+            produto={produto}
+            onAdicionarProduto={this.props.onAdicionarProduto}
+          />
+        })}
         </DivProdutos>
       </Main>
     );

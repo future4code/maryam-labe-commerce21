@@ -2,14 +2,15 @@ import React from "react";
 import styled from "styled-components";
 
 const Cabecalho = styled.header`
-  background-color: #bfddee;
+  background-color: #282657;
   color: #fff;
-  // height: 80px;
   grid-column: span 3;
+  font-size: 60px;
+  text-align: center;
 `;
 
 export default class Header extends React.Component {
   render() {
-    return <Cabecalho>HEADER</Cabecalho>;
+    return <Cabecalho>LOJA DE FOGUETES</Cabecalho>;
   }
 }

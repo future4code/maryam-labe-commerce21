@@ -6,6 +6,7 @@ import Footer from "./components/Footer/Footer.js";
 import Products from "./components/Products/Products";
 import ShoppingCart from "./components/ShoppingCart/ShoppingCart";
 import Header from "./components/Header/Header.js";
+import Foguete from "./img/foguete.webp";
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -21,98 +22,137 @@ const Div = styled.div`
   grid-template-rows: 80px 1fr 80px;
   gap: 10px;
   min-height: 100vh;
+
+  @media screen and (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+  }
 `;
 
-// const Header = styled.header`
-//   background-color: #bfddee;
-//   color: #fff;
-//   // height: 80px;
-//   grid-column: span 3;
-// `;
-
-// const Nav = styled.nav`
-//   background-color: green;
-//   display: flex;
-//   flex-direction: column;
-//   padding: 15px;
-//   width: 15vw;
-// `;
-
-// const Main = styled.main`
-//   background-color: yellow;
-//   display: flex;
-//   flex-direction: column;
-//   gap: 10px;
-//   margin: 0 auto;
-//   padding: 30px;
-//   width: 60vw;
-// `;
-
-// const Aside = styled.aside`
-//   background-color: green;
-//   padding: 15px;
-//   width: 15vw;
-// `;
-
-// const Footer = styled.footer`
-//   background-color: #bfddee;
-//   color: #fff;
-//   grid-column: span 3;
-// `;
-
-// const CabecalhoMain = styled.div`
-//   background-color: grey;
-//   display: flex;
-//   align-items: center;
-//   justify-content: space-between;
-//   height: 50px;
-//   text-align: center;
-// `;
-
-// const ContainerOrdenacao = styled.div`
-//   display: flex;
-
-//   p {
-//     margin-right: 8px;
-//   }
-// `;
-
-// const DivProdutos = styled.div`
-//   display: grid;
-//   grid-template-columns: repeat(auto-fit, 250px);
-//   gap: 8px;
-//   padding: 10px;
-//   justify-content: center;
-// `;
-
-// const CardProduto = styled.div`
-//   background-color: hotpink;
-
-//   img {
-//     // height: 250px;
-//     max-width: 100%;
-//   }
-// `;
-
-// const ItemCarrinho = styled.div`
-//   display: flex;
-//   align-items: center;
-//   justify-content: space-between;
-//   // width: 300px;
-// `;
+const produtos = [
+  {
+    id: 1,
+    nome: 'Sputnik',
+    preco: 1_000_000,
+    foto: {Foguete}
+  },
+  {
+    id: 2,
+    nome: 'Discovery',
+    preco: 30_000,
+    foto: {Foguete}
+  },
+  {
+    id: 3,
+    nome: 'Apollo 1',
+    preco: 500_000,
+    foto: {Foguete}
+  },
+  {
+    id: 4,
+    nome: 'SM-65E Atlas',
+    preco: 400_000,
+    foto: {Foguete}
+  },
+  {
+    id: 5,
+    nome: 'Thor-Ablestar',
+    preco: 200_000,
+    foto: {Foguete}
+  },
+  {
+    id: 6,
+    nome: 'Atlas',
+    preco: 4_000_000,
+    foto: {Foguete}
+  },
+]
 
 export default class App extends React.Component {
+  
+  state = {
+    minimoFilter: "",
+    maximoFilter: "",
+    nomeFilter: "",
+    produtosCarrinho: []
+  }
+
+  onChangeMinimoFilter = (e) => {
+    this.setState({minimoFilter: e.target.value})
+  }
+
+  onChangeMaximoFilter = (e) => {
+    this.setState({maximoFilter: e.target.value})
+  }
+
+  onChangeNomeFilter = (e) => {
+    this.setState({nomeFilter: e.target.value})
+  }
+
+  onAdicionarProduto = (produtoId) => {
+    const produtoCarrinho = this.state.produtosCarrinho.find(produto => produtoId === produto.id)
+
+    if(produtoCarrinho) {
+      const novosProdutosCarrinho = this.state.produtosCarrinho.map(produto => {
+        if(produtoId === produto.id) {
+          return {
+            ...produto,
+            quantidade: produto.quantidade + 1
+          }
+        }
+
+        return produto
+      })
+
+      this.setState({produtosCarrinho: novosProdutosCarrinho})
+    } else {
+      const produtosAdicionados = produtos.find(produto => produtoId === produto.id)
+
+      const novosProdutosCarrinho = [...this.state.produtosCarrinho, {...produtosAdicionados, quantidade: 1}]
+
+      this.setState({produtosCarrinho: novosProdutosCarrinho})
+    }
+  }
+
+  onTirarProduto = (produtoId) => {
+    const novosProdutosCarrinho = this.state.produtosCarrinho.map((produto) => {
+      if(produto.id === produtoId) {
+        return {
+          ...produto,
+          quantidade: produto.quantidade - 1
+        }
+      }
+      return produto
+    }).filter((produto) => produto.quantidade > 0)
+
+    this.setState({produtosCarrinho: novosProdutosCarrinho})
+  }
+
   render() {
     return (
       <Div>
         <GlobalStyle />
         <Header />
 
-        <Filters />
+        <Filters 
+        minimoFilter={this.state.minimoFilter}
+        maximoFilter={this.state.maximoFilter}
+        nomeFilter={this.state.nomeFilter}
+        onChangeMinimoFilter={this.onChangeMinimoFilter}            
+        onChangeMaximoFilter={this.onChangeMaximoFilter}            
+        onChangeNomeFilter={this.onChangeNomeFilter} />
 
-        <Products />
+        <Products 
+          produtos={produtos}
+          minimoFilter={this.state.minimoFilter}
+          maximoFilter={this.state.maximoFilter}
+          nomeFilter={this.state.nomeFilter}
+          onAdicionarProduto={this.onAdicionarProduto}/>
 
-        <ShoppingCart />
+        <ShoppingCart 
+        produtosCarrinho={this.state.produtosCarrinho}
+        onTirarProduto={this.onTirarProduto}
+        />
 
         <Footer />
       </Div>
