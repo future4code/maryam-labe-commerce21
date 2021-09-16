@@ -12,9 +12,9 @@ export default class ShoppingCartItem extends React.Component {
     return (
       <div>
         <ItemCarrinho>
-          <p>1x</p>
-          <p>Produto 100</p>
-          <button>Remover</button>
+          <p>{this.props.cartItem.quantidade}x</p>
+          <p>{this.props.cartItem.nome}</p>
+          <button onClick={() => this.props.onTirarProduto(this.props.cartItem.id)}>Remover</button>
         </ItemCarrinho>
       </div>
     );
